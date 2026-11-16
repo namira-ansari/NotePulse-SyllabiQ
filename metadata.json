@@ -1,0 +1,6 @@
+{
+  "name": "NotePulse",
+  "description": "SyllabiQ Study Engine — Turn heavy PDFs, textbook photos, and lecture notes into exam-ready study guides in seconds.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

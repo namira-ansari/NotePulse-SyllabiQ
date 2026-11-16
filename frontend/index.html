@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NotePulse — SyllabiQ Study Engine</title>
+  <meta name="description" content="Turn heavy 90-page PDFs, textbook photos, and lecture notes into exam-ready study guides in seconds." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="ambient-glow" aria-hidden="true"></div>
+
+  <div class="app-shell">
+    <!-- Clean Header -->
+    <header class="site-header">
+      <div class="brand-row">
+        <h1 class="brand-title">Note<span class="brand-accent">Pulse</span></h1>
+        <span class="engine-badge">SyllabiQ Study Engine</span>
+      </div>
+      <p class="site-subtitle">
+        Turn heavy 90-page PDFs, textbook photos, and lecture notes into exam-ready study guides in seconds.
+      </p>
+    </header>
+
+    <!-- Two-Column Study Workbench -->
+    <main class="workbench">
+      <!-- Left Card: 1. Add Your Study Material -->
+      <section class="card input-card" aria-labelledby="input-heading">
+        <div class="card-header">
+          <h2 id="input-heading" class="card-title">1. Add Your Study Material</h2>
+        </div>
+
+        <form id="study-form" class="study-form" novalidate>
+          <!-- Subject / Course Code -->
+          <div class="field-group">
+            <label for="course-input" class="field-label">Subject or Course Code</label>
+            <input
+              type="text"
+              id="course-input"
+              name="course_info"
+              class="text-input"
+              placeholder="e.g., 101 - Problem Solving Using C, or Biology Ch. 4"
+              autocomplete="off"
+            />
+          </div>
+
+          <!-- Visual Format Selector (2x3 Grid) -->
+          <div class="field-group">
+            <span class="field-label" id="format-group-label">Choose Your Study Format</span>
+            <div class="format-grid" role="radiogroup" aria-labelledby="format-group-label">
+              <button type="button" class="format-card active" data-format="compact_notes" data-label="✨ Compact Cheat Sheet" aria-pressed="true">
+                <span class="format-emoji" aria-hidden="true">✨</span>
+                <span class="format-name">Compact Cheat Sheet</span>
+              </button>
+
+              <button type="button" class="format-card" data-format="exam_blueprint" data-label="🎯 Exam IMPs (1M & 4M)" aria-pressed="false">
+                <span class="format-emoji" aria-hidden="true">🎯</span>
+                <span class="format-name">Exam IMPs (1M & 4M)</span>
+              </button>
+
+              <button type="button" class="format-card" data-format="mnemonics" data-label="🧠 Memory Tricks" aria-pressed="false">
+                <span class="format-emoji" aria-hidden="true">🧠</span>
+                <span class="format-name">Memory Tricks</span>
+              </button>
+
+              <button type="button" class="format-card" data-format="mind_map" data-label="🗺️ Visual Topic Tree" aria-pressed="false">
+                <span class="format-emoji" aria-hidden="true">🗺️</span>
+                <span class="format-name">Visual Topic Tree</span>
+              </button>
+
+              <button type="button" class="format-card" data-format="summarize" data-label="⚡ Quick Summary" aria-pressed="false">
+                <span class="format-emoji" aria-hidden="true">⚡</span>
+                <span class="format-name">Quick Summary</span>
+              </button>
+
+              <button type="button" class="format-card" data-format="flashcard_quiz" data-label="🃏 Practice Quiz (5 MCQs)" aria-pressed="false">
+                <span class="format-emoji" aria-hidden="true">🃏</span>
+                <span class="format-name">Practice Quiz (5 MCQs)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Multi-File Drag-and-Drop Zone -->
+          <div class="field-group">
+            <label for="file-input" class="field-label">Upload Textbooks, Notes, or Photos</label>
+            <div
+              id="drop-zone"
+              class="drop-zone"
+              tabindex="0"
+              role="button"
+              aria-label="Drop PDFs, Word documents, text files, or photos here, or click to browse"
+            >
+              <input
+                type="file"
+                id="file-input"
+                name="documents"
+                multiple
+                accept=".pdf,.docx,.txt,.md,image/*"
+                hidden
+              />
+              <div class="drop-zone-prompt">
+                <div class="drop-icon" aria-hidden="true">📚</div>
+                <p class="drop-headline">Drag &amp; drop multiple files here, or <span class="browse-link">browse your device</span></p>
+                <p class="drop-hint">Supports PDF textbooks, Word docs (.docx), text notes (.txt), and photos of book pages or boards</p>
+              </div>
+              <ul id="file-list" class="file-list" aria-live="polite"></ul>
+            </div>
+          </div>
+
+          <!-- Raw Textarea -->
+          <div class="field-group">
+            <label for="notes-input" class="field-label">Or paste your notes / syllabus topics directly...</label>
+            <textarea
+              id="notes-input"
+              name="text_content"
+              class="notes-textarea"
+              rows="5"
+              placeholder="Paste lecture paragraphs, syllabus units, definitions, or key concepts here..."
+            ></textarea>
+          </div>
+
+          <!-- Friendly Error Alert -->
+          <div id="error-banner" class="error-banner" role="alert" hidden></div>
+
+          <!-- Primary CTA Button -->
+          <button type="submit" id="generate-btn" class="cta-button">
+            <span class="cta-label">✨ Create My Study Guide</span>
+            <span class="cta-spinner" aria-hidden="true" hidden></span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Right Card: 2. Your Study Guide -->
+      <section class="card output-card" aria-labelledby="output-heading">
+        <div class="output-top-bar">
+          <h2 id="output-heading" class="card-title">2. Your Study Guide</h2>
+          <div class="stats-pills">
+            <span id="selected-format-pill" class="stat-pill format-pill">✨ Compact Cheat Sheet</span>
+            <span id="time-saved-pill" class="stat-pill time-pill" hidden>⏱️ Saves ~1 min of reading</span>
+          </div>
+        </div>
+
+        <div id="notice-banner" class="notice-banner" role="status" hidden></div>
+
+        <!-- Print-only subject header -->
+        <div id="print-header" class="print-header" aria-hidden="true">
+          <h1 id="print-title">NotePulse Study Guide</h1>
+          <p id="print-subtitle"></p>
+        </div>
+
+        <!-- Spacious Digital Notebook Reading Canvas -->
+        <div id="output-canvas" class="output-canvas" aria-live="polite">
+          <div class="empty-state">
+            <div class="empty-illustration" aria-hidden="true">📖</div>
+            <h3 class="empty-title">Your personalized study notebook is ready</h3>
+            <p class="empty-copy">
+              Attach one or multiple class PDFs, Word notes, or textbook photos on the left—or paste your syllabus—and pick how you want to study.
+            </p>
+            <div class="empty-highlights">
+              <div class="highlight-item">
+                <strong>Fast Revision</strong>
+                <span>Condenses 90+ page chapters into crisp cheat sheets and 60-second summaries.</span>
+              </div>
+              <div class="highlight-item">
+                <strong>Exam Ready</strong>
+                <span>Splits topics into 1-mark short Q&amp;As, 4-mark long questions, and memory tricks.</span>
+              </div>
+              <div class="highlight-item">
+                <strong>Active Recall</strong>
+                <span>Test yourself right away with a 5-question interactive quiz and explanations.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive 5-Question Flashcard Quiz Container -->
+        <div id="quiz-container" class="quiz-container" hidden aria-live="polite">
+          <div class="quiz-header">
+            <div class="quiz-score-wrap">
+              <span class="quiz-title-label">Practice Quiz</span>
+              <span id="quiz-score" class="quiz-score">Score: 0 / 5</span>
+            </div>
+            <button type="button" id="retake-quiz-btn" class="retake-btn">↻ Retake Quiz</button>
+          </div>
+          <div id="quiz-cards" class="quiz-cards"></div>
+        </div>
+
+        <!-- Bottom Export & Action Bar -->
+        <div class="export-bar">
+          <button type="button" id="copy-btn" class="export-btn" disabled>📋 Copy Notes</button>
+          <button type="button" id="export-doc-btn" class="export-btn" disabled>📄 Save Word Doc (.doc)</button>
+          <button type="button" id="export-txt-btn" class="export-btn" disabled>📝 Save Text (.txt)</button>
+          <button type="button" id="print-btn" class="export-btn" disabled>🖨️ Print / Save PDF</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
